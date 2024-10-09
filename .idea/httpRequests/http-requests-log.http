@@ -1,0 +1,30 @@
+POST http://localhost:8080/ems/api/v1/employees/register
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2024.2.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+content-length: 0
+
+<> 2024-10-08T235147.401.txt
+
+###
+
+GET http://localhost:8080/ems/api/v1/employees
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2024.2.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+content-length: 0
+
+<> 2024-10-08T235113.401.txt
+
+###
+
+GET http://localhost:8080/ems/api/v1/employees/register
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2024.2.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+content-length: 0
+
+<> 2024-10-08T235052.401.txt
+
+###
+
