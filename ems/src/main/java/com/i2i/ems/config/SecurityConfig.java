@@ -65,10 +65,10 @@ public class SecurityConfig {
      * @return the configured AuthenticationProvider
      */
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider provideAuthentication() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
+        provider.setPasswordEncoder(encodePassword());
         return provider;
     }
 
@@ -80,12 +80,12 @@ public class SecurityConfig {
      * @throws Exception if an error occurs during configuration
      */
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+    public AuthenticationManager manageAuthentication(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.eraseCredentials(false)
                 .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
+                .passwordEncoder(encodePassword());
         return authenticationManagerBuilder.build();
     }
 
@@ -95,7 +95,7 @@ public class SecurityConfig {
      * @return the configured BCryptPasswordEncoder
      */
     @Bean
-    protected BCryptPasswordEncoder passwordEncoder() {
+    protected BCryptPasswordEncoder encodePassword() {
         return new BCryptPasswordEncoder(12);
     }
 }
