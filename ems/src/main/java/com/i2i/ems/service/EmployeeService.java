@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -46,18 +47,25 @@ public class EmployeeService {
      *
      * @param employeeDTO to create new employee.
      * @return the created employeeDto object.
-     * @throws CustomException if exception is thrown.
+     * @throws CustomException, DuplicateKeyException if exception is thrown.
      */
     public EmployeeDto addEmployee(EmployeeDto employeeDTO) throws CustomException {
         try {
             Employee employee = EmployeeMapper.dtoToModel((employeeDTO));
+            if (employeeRepository.existsByEmailAndIsDeletedByFalse(employeeDTO.getEmail())) {
+                throw new DuplicateKeyException("Employee exists with same Email Id");
+            }
             employee.setPassword(encoder.encode(employeeDTO.getPassword()));
             employeeRepository.save(employee);
             EmployeeDto employeeDto = EmployeeMapper.modelToDto((employee));
             logger.info("Employee added successfully with ID: {}", employeeDto.getId());
             return employeeDto;
         } catch (Exception e) {
-            logger.error("Error adding a employee", e); //add statement
+            if (e instanceof DuplicateKeyException) {
+                logger.error("Employee already exists with same Email Id");
+                throw e;
+            }
+            logger.error("Error adding an employee", e);
             throw new CustomException("Server Error!!!!", e);
         }
     }
@@ -95,7 +103,7 @@ public class EmployeeService {
         try {
             Pageable pageable = PageRequest.of(page, size);
             Page<Employee> employeePage = employeeRepository.findAllByIsDeletedFalse(pageable);
-            logger.info("Displayed employee details for page " + page);
+            logger.info("Displayed employee details for page : {}", page);
             return employeePage.getContent().stream()
                     .map(EmployeeMapper::modelToDto)
                     .collect(Collectors.toList());
@@ -104,7 +112,6 @@ public class EmployeeService {
             throw new CustomException("Server Error!!!!", e);
         }
     }
-
 
     /**
      * <p>

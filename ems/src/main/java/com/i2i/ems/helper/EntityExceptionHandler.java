@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -74,5 +75,10 @@ public class EntityExceptionHandler {
     @ExceptionHandler(value = {JwtAuthenticationException.class})
     public ResponseEntity<String> handleJwtAuthenticationException(JwtAuthenticationException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = {DuplicateKeyException.class})
+    public ResponseEntity<String> handleDuplicateKeyException(DuplicateKeyException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
     }
 }
