@@ -40,7 +40,7 @@ public class ProjectService {
             return projectDto1;
         } catch (Exception e) {
             logger.error("Error adding employee", e);
-            throw new CustomException(e.getMessage());
+            throw new CustomException("Server error!!!",e);
         }
     }
 
@@ -56,10 +56,14 @@ public class ProjectService {
     public Project getProjectById(int id) throws NoSuchElementException, CustomException {
         try {
             logger.info("Retrieved project details for ID: {}", id);
-            return projectRepository.findByProjectIdAndIsDeletedFalse(id);
+            Project project = projectRepository.findByProjectIdAndIsDeletedFalse(id);
+            if (project == null) {
+                throw new NoSuchElementException("No project found with ID: " + id);
+            }
+            return project;
         } catch (NoSuchElementException e) {
-            logger.error("Error in retrieving employee with given id : {}", id, e);
-            throw new NoSuchElementException("No Project found with id: " + id, e);
+            logger.error("No project found with ID : {}", id, e);
+            throw e;
         } catch (Exception e) {
             logger.error("Error in retrieving employee with given id : {}", id, e);
             throw new CustomException("Server Error!!!!", e);
@@ -95,15 +99,12 @@ public class ProjectService {
      * @param id to delete the employee.
      * @throws NoSuchElementException, CustomException if exception occurred.
      */
-    public void deleteProject(int id) throws NoSuchElementException, CustomException {
+    public void deleteProject(int id) throws CustomException {
         try {
             Project project = getProjectById(id);
             project.setDeleted(true);
             projectRepository.save(project);
             logger.info("Project removed successfully with ID: {}", id);
-        } catch (NoSuchElementException e) {
-            logger.error("Error in removing the project with the given id : {}", id, e);
-            throw new NoSuchElementException("No Project found with id: " + id, e);
         } catch (Exception e) {
             logger.error("Error in removing the project with the given id : {}", id, e);
             throw new CustomException("Server Error!!!!", e);

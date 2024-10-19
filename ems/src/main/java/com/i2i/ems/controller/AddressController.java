@@ -40,7 +40,7 @@ public class AddressController {
     public ResponseEntity<AddressDto> addAddress(@Validated @PathVariable int employeeId,
                                                  @RequestBody AddressDto addressDto)
             throws CustomException {
-        AddressDto createdAddress = addressService.addAddress(employeeId, addressDto);
+        AddressDto createdAddress = addressService.addAddress(addressDto);
         return new ResponseEntity<>(createdAddress, HttpStatus.CREATED);
     }
 

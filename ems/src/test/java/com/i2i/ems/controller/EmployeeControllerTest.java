@@ -1,4 +1,4 @@
-package com.i2i.ems.controllerTest;
+package com.i2i.ems.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import com.i2i.ems.controller.EmployeeController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -36,11 +36,11 @@ class EmployeeControllerTest {
 
     @BeforeEach
     void setUp() {
-
         MockitoAnnotations.openMocks(this);
-        employeeDto = new EmployeeDto();
-        employeeDto.setId(1);
-        employeeDto.setName("Arthi");
+        employeeDto = EmployeeDto.builder()
+                .id(1)
+                .name("test")
+                .build();
     }
 
     @Test
@@ -61,7 +61,7 @@ class EmployeeControllerTest {
         ResponseEntity<EmployeeDto> response = employeeController.updateEmployee(employeeDto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Arthi", response.getBody().getName());
+        assertEquals("test", Objects.requireNonNull(response.getBody()).getName());
         verify(employeeService, times(1)).updateEmployee(any(EmployeeDto.class));
     }
 
@@ -72,7 +72,7 @@ class EmployeeControllerTest {
         ResponseEntity<EmployeeDto> response = employeeController.getEmployeeById(1);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Arthi", response.getBody().getName());
+        assertEquals("test", Objects.requireNonNull(response.getBody()).getName());
         verify(employeeService, times(1)).getEmployeeById(anyInt());
     }
 
@@ -84,14 +84,11 @@ class EmployeeControllerTest {
         employeeDto2.setId(2);
         employeeDto2.setName("Jane");
         employees.add(employeeDto2);
-
         when(employeeService.getAllEmployees(0, 10)).thenReturn(employees);
-
         ResponseEntity<List<EmployeeDto>> response = employeeController.getAllEmployees(0, 10);
-
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody().size());
-        assertEquals("Arthi", response.getBody().get(0).getName());
+        assertEquals(2, Objects.requireNonNull(response.getBody()).size());
+        assertEquals("test", response.getBody().get(0).getName());
         assertEquals("Jane", response.getBody().get(1).getName());
         verify(employeeService, times(1)).getAllEmployees(0, 10);
     }
@@ -99,7 +96,6 @@ class EmployeeControllerTest {
     @Test
     void testRemoveEmployee() throws CustomException {
         ResponseEntity<HttpStatus> response = employeeController.removeEmployee(1);
-
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(employeeService, times(1)).deleteEmployee(1);
     }
@@ -108,11 +104,8 @@ class EmployeeControllerTest {
     void testLogin() throws CustomException {
         employeeDto.setEmail("test@gmail.com");
         employeeDto.setPassword("password");
-
         when(employeeService.authenticateEmployee(any(EmployeeDto.class))).thenReturn("token123");
-
         String token = employeeController.login(employeeDto);
-
         assertEquals("token123", token);
         verify(employeeService, times(1)).authenticateEmployee(any(EmployeeDto.class));
     }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import com.i2i.ems.model.Address;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import com.i2i.ems.dto.EmployeeDto;
 import com.i2i.ems.helper.CustomException;
 import com.i2i.ems.mapper.EmployeeMapper;
-import com.i2i.ems.model.Address;
 import com.i2i.ems.model.Employee;
 import com.i2i.ems.repository.EmployeeRepository;
 import com.i2i.ems.util.JwtUtil;
@@ -49,7 +49,7 @@ public class EmployeeService {
      * @return the created employeeDto object.
      * @throws CustomException, DuplicateKeyException if exception is thrown.
      */
-    public EmployeeDto addEmployee(EmployeeDto employeeDTO) throws CustomException {
+    public EmployeeDto addEmployee(EmployeeDto employeeDTO) throws DuplicateKeyException, CustomException {
         try {
             Employee employee = EmployeeMapper.dtoToModel((employeeDTO));
             if (employeeRepository.existsByEmailAndIsDeletedByFalse(employeeDTO.getEmail())) {
@@ -122,14 +122,20 @@ public class EmployeeService {
      * @return the Employee object.
      * @throws NoSuchElementException when occurred.
      */
-    public EmployeeDto getEmployeeById(int id) throws NoSuchElementException {
+    public EmployeeDto getEmployeeById(int id) throws NoSuchElementException, CustomException {
         try {
             Employee employee = employeeRepository.findByIdAndIsDeletedFalse(id);
+            if (employee == null) {
+                throw new NoSuchElementException("Employee not found for the given id: " + id);
+            }
             logger.info("Retrieved employee details for ID: {}", id);
             return EmployeeMapper.modelToDto(employee);
+        } catch (NoSuchElementException e) {
+            logger.error("Employee not found", e);
+            throw e;
         } catch (Exception e) {
             logger.error("Error in retrieving an employee : {}", id, e);
-            throw new NoSuchElementException("No Employee found with id: " + id, e);
+            throw new CustomException("Server error!!", e);
         }
     }
 
@@ -144,6 +150,9 @@ public class EmployeeService {
     public void deleteEmployee(int id) throws NoSuchElementException, CustomException {
         try {
             Employee employee = employeeRepository.findByIdAndIsDeletedFalse(id);
+            if (employee == null) {
+                throw new NoSuchElementException("Employee not found for the given id: " + id);
+            }
             Address address = employee.getAddress();
             if (null != address) {
                 address.setDeleted(true);
@@ -153,7 +162,7 @@ public class EmployeeService {
             logger.info("Employee removed successfully with ID: {}", id);
         } catch (NoSuchElementException e) {
             logger.error("Error in removing an employee : {}", id, e);
-            throw new NoSuchElementException("No Employee found with id: " + id, e);
+            throw e;
         } catch (Exception e) {
             logger.error("Error in removing an employee : {}", id, e);
             throw new CustomException("Server Error!!!!", e);

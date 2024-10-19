@@ -11,7 +11,7 @@ public class ProjectMapper {
     public static ProjectDto modelToDto(Project project) {
         return ProjectDto.builder()
                 .projectId(project.getProjectId())
-                .name(project.getHead())
+                .name(project.getName())
                 .domain(project.getDomain())
                 .head(project.getHead())
                 .build();
@@ -20,7 +20,7 @@ public class ProjectMapper {
     public static Project dtoToModel(ProjectDto projectDto) {
         return Project.builder()
                 .projectId(projectDto.getProjectId())
-                .name(projectDto.getHead())
+                .name(projectDto.getName())
                 .domain(projectDto.getDomain())
                 .head(projectDto.getHead())
                 .build();

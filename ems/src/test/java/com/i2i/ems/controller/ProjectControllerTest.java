@@ -1,4 +1,4 @@
-package com.i2i.ems.controllerTest;
+package com.i2i.ems.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -8,7 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.i2i.ems.controller.ProjectController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -36,27 +35,18 @@ class ProjectControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
-        // projectDto = ProjectDto.builder()
-        //         .projectId(1)
-        //         .name("Test Name")
-        //         .domain("Test Domain")
-        //         .head("Test Head")
-        //         .build();
-
-        projectDto = new ProjectDto();
-        project = new Project();
-        project.setProjectId(1);
-        project.setName("Test Name");
-        project.setDomain("Test Domain");
-        project.setHead("Test Head");
+        projectDto = ProjectDto.builder()
+                .projectId(1)
+                .name("Test Name")
+                .domain("Test Domain")
+                .head("Test Head")
+                .build();
     }
 
     @Test
     void testAddProject() throws CustomException {
         when(projectService.addProject(any(ProjectDto.class))).thenReturn(projectDto);
         ResponseEntity<ProjectDto> response = projectController.addProject(projectDto, "1");
-
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(projectDto, response.getBody());
         verify(projectService, times(1)).addProject(any(ProjectDto.class));
@@ -66,7 +56,6 @@ class ProjectControllerTest {
     void testUpdateProject() throws CustomException {
         when(projectService.updateProject(any(ProjectDto.class))).thenReturn(projectDto);
         ResponseEntity<ProjectDto> response = projectController.updateProject(projectDto, "1");
-
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(projectDto, response.getBody());
         verify(projectService, times(1)).updateProject(any(ProjectDto.class));
@@ -76,7 +65,6 @@ class ProjectControllerTest {
     void testGetProjectById() throws CustomException {
         when(projectService.getProjectById(anyInt())).thenReturn(project);
         ResponseEntity<Project> response = projectController.getProjectById(1, "1");
-
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(project, response.getBody());
         verify(projectService, times(1)).getProjectById(1);
@@ -86,7 +74,6 @@ class ProjectControllerTest {
     void testRemoveProject() throws CustomException {
         doNothing().when(projectService).deleteProject(anyInt());
         ResponseEntity<HttpStatus> response = projectController.removeProject(1, "1");
-
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(projectService, times(1)).deleteProject(1);
     }

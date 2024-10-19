@@ -26,11 +26,11 @@ public class AddressService {
      * Adds a new address by collecting details from user input.
      * </p>
      *
-     * @param employeeId and addressDto to add the address.
+     * @param addressDto to add the address.
      * @return the newly created Address object.
      * @throws CustomException when exception is thrown.
      */
-    public AddressDto addAddress(int employeeId, AddressDto addressDto) throws CustomException {
+    public AddressDto addAddress(AddressDto addressDto) throws CustomException {
         try {
             Address address = AddressMapper.dtoToModel(addressDto);
             address = addressRepository.save(address);
@@ -46,7 +46,7 @@ public class AddressService {
 
     /**
      * <p>
-     *  updates the user with the new address.
+     * updates the user with the new address.
      * </p>
      *
      * @param employeeId and the addressDto to update the address.
@@ -70,7 +70,14 @@ public class AddressService {
 
     public Address getAddressByEmployeeId(int id) throws CustomException {
         try {
-            return addressRepository.findByAddressIdAndIsDeletedFalse(id);
+            Address address = addressRepository.findByEmployeeIdAndIsDeletedFalse(id);
+            if (address == null) {
+                throw new NoSuchElementException("No address found for ID: " + id);
+            }
+            return address;
+        } catch (NoSuchElementException e) {
+            logger.error("No address found for ID: " + id);
+            throw e;
         } catch (Exception e) {
             logger.error("Error retrieving an address with employee id : {} ", id, e);
             throw new CustomException("Server Error!!!!", e);
@@ -79,20 +86,23 @@ public class AddressService {
 
     /**
      * <p>
-     *  Retrieves and displays the details of an address.
+     * Retrieves and displays the details of an address.
      * </p>
      *
      * @param id to retrieve the address.
      * @return the address object.
-     * @throws NullPointerException, CustomException
+     * @throws NoSuchElementException, CustomException
      */
-    public AddressDto getAddressById(int id) throws NullPointerException, CustomException {
+    public AddressDto getAddressById(int id) throws NoSuchElementException, CustomException {
         try {
             Address address = addressRepository.findByAddressIdAndIsDeletedFalse(id);
+            if (address == null) {
+                throw new NoSuchElementException("Address not found for the given id: " + id);
+            }
             logger.info("Retrieved address details for ID: {}", id);
             return AddressMapper.modelToDto(address);
         } catch (NoSuchElementException e) {
-            throw new NoSuchElementException("No Address found with id: " + id, e);
+            throw e;
         } catch (Exception e) {
             logger.error("Error in retrieving an address with id : {} ", id, e);
             throw new CustomException("Server Error!!!!", e);
@@ -107,17 +117,12 @@ public class AddressService {
      * @param id for deleting the address.
      * @throws NoSuchElementException, CustomException.
      */
-    public void deleteAddress(int id) throws NoSuchElementException, CustomException {
+    public void deleteAddress(int id) throws CustomException {
         try {
             Address address = getAddressByEmployeeId(id);
-            if (null != address) {
-                address.setDeleted(true);
-                addressRepository.save(address);
-            }
+            address.setDeleted(true);
+            addressRepository.save(address);
             logger.info("Address removed successfully with ID: {}", id);
-        } catch (NoSuchElementException e) {
-            logger.error("Error in deleting an address with the id : {}", id, e);
-            throw new NoSuchElementException("No Address found with id: " + id, e);
         } catch (Exception e) {
             logger.error("Error in deleting an address with the id : {}", id, e);
             throw new CustomException("Server Error!!!!", e);

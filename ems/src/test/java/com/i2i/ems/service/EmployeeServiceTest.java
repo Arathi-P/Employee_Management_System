@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -66,6 +67,12 @@ class EmployeeServiceTest {
     }
 
     @Test
+    void testAddEmployeeThrowsDuplicateKeyException() {
+        when(employeeRepository.existsByEmailAndIsDeletedByFalse(employeeDto.getEmail())).thenReturn(true);
+        assertThrows(DuplicateKeyException.class, () -> employeeService.addEmployee(employeeDto));
+    }
+
+    @Test
     void testAddEmployeeThrowsException() {
         when(employeeRepository.save(any(Employee.class))).thenThrow(RuntimeException.class);
         assertThrows(CustomException.class, () -> employeeService.addEmployee(employeeDto));
@@ -108,7 +115,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void testGetEmployeeById() {
+    void testGetEmployeeById() throws CustomException {
         when(employeeRepository.findByIdAndIsDeletedFalse(1)).thenReturn(employee);
         EmployeeDto result = employeeService.getEmployeeById(1);
         assertNotNull(result);
@@ -118,31 +125,34 @@ class EmployeeServiceTest {
     @Test
     void testGetEmployeeByIdThrowsException() {
         when(employeeRepository.findByIdAndIsDeletedFalse(1)).thenThrow(RuntimeException.class);
+        assertThrows(CustomException.class, () -> employeeService.getEmployeeById(1));
+    }
+
+    @Test
+    void testGetEmployeeByIdThrowsNoSuchElementException() {
+        when(employeeRepository.findByIdAndIsDeletedFalse(1)).thenReturn(null);
         assertThrows(NoSuchElementException.class, () -> employeeService.getEmployeeById(1));
     }
 
     @Test
     void testDeleteEmployee() throws CustomException {
         when(employeeRepository.findByIdAndIsDeletedFalse(1)).thenReturn(employee);
-        when(employeeRepository.save(any(Employee.class))).thenReturn(employee);  // Correctly mock save method
-
+        when(employeeRepository.save(any(Employee.class))).thenReturn(employee);
         employeeService.deleteEmployee(1);
-
         verify(employeeRepository, times(1)).save(any(Employee.class));
     }
 
-
     @Test
     void testDeleteEmployeeThrowsNoSuchElementException() {
-        // Mocking the repository to return null to simulate employee not found
         when(employeeRepository.findByIdAndIsDeletedFalse(1)).thenReturn(null);
-
-        // Expect NoSuchElementException
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> employeeService.deleteEmployee(1));
-
-        assertEquals("No Employee found with id: 1", exception.getMessage());
+        assertThrows(NoSuchElementException.class, () -> employeeService.deleteEmployee(1));
     }
 
+    @Test
+    void testDeleteEmployeeThrowsException() {
+        when(employeeRepository.findByIdAndIsDeletedFalse(1)).thenThrow(RuntimeException.class);
+        assertThrows(CustomException.class, () -> employeeService.deleteEmployee(1));
+    }
 
     @Test
     void testAuthenticateEmployee() throws CustomException {

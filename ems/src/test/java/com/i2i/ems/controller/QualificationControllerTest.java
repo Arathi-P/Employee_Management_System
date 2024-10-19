@@ -1,4 +1,4 @@
-package com.i2i.ems.controllerTest;
+package com.i2i.ems.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -8,7 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.i2i.ems.controller.QualificationController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -43,12 +42,6 @@ class QualificationControllerTest {
                 .courseType("Test Institute")
                 .courseDuration("2")
                 .build();
-
-        qualification = new Qualification();
-        qualification.setQualificationId(1);
-        qualification.setCourseName("Test Qualification");
-        qualification.setCourseType("Test Institute");
-        qualification.setCourseDuration("2");
     }
 
     @Test

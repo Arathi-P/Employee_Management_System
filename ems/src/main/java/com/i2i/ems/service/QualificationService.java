@@ -38,7 +38,7 @@ public class QualificationService {
             logger.info("Qualification added with the ID : {} ", qualificationDto1.getQualificationId());
             return qualificationDto1;
         } catch (Exception e) {
-            logger.error("Error adding employee",e);
+            logger.error("Error adding employee", e);
             throw new CustomException("Server Error!!!!", e);
         }
     }
@@ -55,10 +55,14 @@ public class QualificationService {
     public Qualification getQualificationById(int id) throws NoSuchElementException, CustomException {
         try {
             logger.info("Retrieved qualification details for ID: {}", id);
-            return qualificationRepository.findByQualificationIdAndIsDeletedFalse(id);
+            Qualification qualification = qualificationRepository.findByQualificationIdAndIsDeletedFalse(id);
+            if (qualification == null) {
+                throw new NoSuchElementException("Qualification not found for ID: " + id);
+            }
+            return qualification;
         } catch (NoSuchElementException e) {
             logger.error("Error in retrieving the employee with the given id : {}", id, e);
-            throw new NoSuchElementException("No Qualification found with id: " + id, e);
+            throw e;
         } catch (Exception e) {
             logger.error("Error in retrieving the employee with the given id : {}", id, e);
             throw new CustomException("Server Error!!!!", e);
@@ -80,12 +84,15 @@ public class QualificationService {
     public void deleteQualification(int id) throws CustomException, NoSuchElementException {
         try {
             Qualification qualification = qualificationRepository.findByQualificationIdAndIsDeletedFalse(id);
+            if (qualification == null) {
+                throw new NoSuchElementException("Qualification not found for ID: " + id);
+            }
             qualification.setDeleted(true);
             qualificationRepository.save(qualification);
             logger.info("Qualification removed successfully with ID: {}", id);
         } catch (NoSuchElementException e) {
             logger.error("Error in removing the employee : {} ", id, e);
-            throw new NoSuchElementException("No Qualification found with id: " + id, e);
+            throw e;
         } catch (Exception e) {
             logger.error("Error in removing the employee : {} ", id, e);
             throw new CustomException("Server Error!!!!", e);
