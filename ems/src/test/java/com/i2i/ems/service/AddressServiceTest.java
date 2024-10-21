@@ -1,27 +1,33 @@
 package com.i2i.ems.service;
 
-import com.i2i.ems.dto.AddressDto;
-import com.i2i.ems.helper.CustomException;
-import com.i2i.ems.model.Address;
-import com.i2i.ems.model.Employee;
-import com.i2i.ems.repository.AddressRepository;
+import java.util.NoSuchElementException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
+import com.i2i.ems.dto.AddressDto;
+import com.i2i.ems.helper.CustomException;
+import com.i2i.ems.model.Address;
+import com.i2i.ems.model.Employee;
+import com.i2i.ems.repository.AddressRepository;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
 public class AddressServiceTest {
 
     @Mock
     private AddressRepository addressRepository;
+
+    @Mock
+    private EmployeeService employeeService;
 
     @InjectMocks
     private AddressService addressService;
@@ -32,7 +38,6 @@ public class AddressServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         address = Address.builder()
                 .addressId(1)
                 .area("testArea")
@@ -83,21 +88,21 @@ public class AddressServiceTest {
 
     @Test
     void testGetAddressByEmployeeId() throws CustomException {
-        when(addressRepository.findByEmployeeIdAndIsDeletedFalse(1)).thenReturn(address);
-        Address result = addressService.getAddressByEmployeeId(1);
+        when(employeeService.getEmployeeModelById(1)).thenReturn(employee);
+        AddressDto result = addressService.getAddressByEmployeeId(1);
         assertNotNull(result);
         assertEquals(addressDto.getArea(), result.getArea());
     }
 
     @Test
     void testGetAddressByEmployeeIdThrowsException() {
-        when(addressRepository.findByEmployeeIdAndIsDeletedFalse(1)).thenThrow(RuntimeException.class);
+        when(employeeService.getEmployeeModelById(1)).thenThrow(RuntimeException.class);
         assertThrows(CustomException.class, () -> addressService.getAddressByEmployeeId(1));
     }
 
     @Test
     void testGetAddressByEmployeeIdThrowsNoSuchElementException() {
-        when(addressRepository.findByEmployeeIdAndIsDeletedFalse(1)).thenReturn(null);
+        when(employeeService.getEmployeeModelById(1)).thenReturn(null);
         assertThrows(NoSuchElementException.class, () -> addressService.getAddressByEmployeeId(1));
     }
 
@@ -128,8 +133,8 @@ public class AddressServiceTest {
     }
 
     @Test
-    void testDeleteAddress() throws CustomException {
-        when(addressRepository.findByEmployeeIdAndIsDeletedFalse(1)).thenReturn(address);
+    void testDeleteAddress() {
+        when(addressRepository.findByAddressIdAndIsDeletedFalse(1)).thenReturn(address);
         when(addressRepository.save(any(Address.class))).thenReturn(address);
         addressService.deleteAddress(1);
     }
@@ -139,5 +144,6 @@ public class AddressServiceTest {
         when(addressRepository.findByAddressIdAndIsDeletedFalse(1)).thenThrow(RuntimeException.class);
         assertThrows(CustomException.class, () -> addressService.deleteAddress(1));
     }
+
 }
 

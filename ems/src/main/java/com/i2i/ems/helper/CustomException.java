@@ -3,7 +3,7 @@ package com.i2i.ems.helper;
 /**
  * Custom Exception class for handling custom Database Exception
  */
-public class CustomException extends Exception {
+public class CustomException extends RuntimeException {
 
     /**
      * Constructs a new CustomException with the specified detail message.

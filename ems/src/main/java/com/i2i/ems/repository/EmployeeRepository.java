@@ -18,7 +18,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     Employee findByIdAndIsDeletedFalse(int id);
     Employee findByEmail(String username);
 
-    boolean existsByEmailAndIsDeletedByFalse(@Email String email);
+    boolean existsByEmailAndIsDeletedFalse(@Email String email);
 }
 
 

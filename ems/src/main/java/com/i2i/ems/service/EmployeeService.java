@@ -52,7 +52,7 @@ public class EmployeeService {
     public EmployeeDto addEmployee(EmployeeDto employeeDTO) throws DuplicateKeyException, CustomException {
         try {
             Employee employee = EmployeeMapper.dtoToModel((employeeDTO));
-            if (employeeRepository.existsByEmailAndIsDeletedByFalse(employeeDTO.getEmail())) {
+            if (employeeRepository.existsByEmailAndIsDeletedFalse(employeeDTO.getEmail())) {
                 throw new DuplicateKeyException("Employee exists with same Email Id");
             }
             employee.setPassword(encoder.encode(employeeDTO.getPassword()));
@@ -139,6 +139,10 @@ public class EmployeeService {
         }
     }
 
+    public Employee getEmployeeModelById(int id) {
+        return employeeRepository.findByIdAndIsDeletedFalse(id);
+    }
+
     /**
      * <p>
      * Deletes an employee based on the provided ID.
@@ -191,5 +195,16 @@ public class EmployeeService {
             logger.error("Error in employee login", e);
             throw new CustomException("Invalid Username or Password", e);
         }
+    }
+
+    /**
+     * <p>
+     *  Saves an employee.
+     * </p>
+     *
+     * @param employee model.
+     */
+    public void saveEmployee(Employee employee) {
+        employeeRepository.save(employee);
     }
 }

@@ -105,7 +105,7 @@ public class EmployeeController {
      * @throws CustomException .
      */
     @PostMapping("/login")
-    public String login(@RequestBody EmployeeDto employeeDto) throws CustomException {
-        return employeeService.authenticateEmployee(employeeDto);
+    public ResponseEntity<String> login(@RequestBody EmployeeDto employeeDto) throws CustomException {
+        return new ResponseEntity<>(employeeService.authenticateEmployee(employeeDto), HttpStatus.OK);
     }
 }

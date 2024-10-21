@@ -1,18 +1,16 @@
 package com.i2i.ems.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,11 +21,16 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import com.i2i.ems.dto.EmployeeDto;
 import com.i2i.ems.helper.CustomException;
 import com.i2i.ems.model.Employee;
 import com.i2i.ems.repository.EmployeeRepository;
 
+@ExtendWith(MockitoExtension.class)
 class EmployeeServiceTest {
 
     @InjectMocks
@@ -46,7 +49,6 @@ class EmployeeServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         employee = new Employee();
         employee.setId(1);
         employee.setEmail("test@example.com");
@@ -68,7 +70,7 @@ class EmployeeServiceTest {
 
     @Test
     void testAddEmployeeThrowsDuplicateKeyException() {
-        when(employeeRepository.existsByEmailAndIsDeletedByFalse(employeeDto.getEmail())).thenReturn(true);
+        when(employeeRepository.existsByEmailAndIsDeletedFalse(employeeDto.getEmail())).thenReturn(true);
         assertThrows(DuplicateKeyException.class, () -> employeeService.addEmployee(employeeDto));
     }
 

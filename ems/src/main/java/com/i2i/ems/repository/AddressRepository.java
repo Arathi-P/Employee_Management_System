@@ -11,5 +11,5 @@ import com.i2i.ems.model.Address;
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Integer> {
     Address findByAddressIdAndIsDeletedFalse(int id);
-    Address findByEmployeeIdAndIsDeletedFalse(int employeeId);
+   // Address findByEmployeeIdAndIsDeletedFalse(int employeeId);
 }

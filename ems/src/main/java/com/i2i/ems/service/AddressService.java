@@ -2,6 +2,8 @@ package com.i2i.ems.service;
 
 import java.util.NoSuchElementException;
 
+import com.i2i.ems.dto.EmployeeDto;
+import com.i2i.ems.model.Employee;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ public class AddressService {
 
     @Autowired
     private AddressRepository addressRepository;
+
+    @Autowired
+    private EmployeeService employeeService;
 
     private static final Logger logger = LogManager.getLogger(AddressService.class);
 
@@ -68,16 +73,10 @@ public class AddressService {
         }
     }
 
-    public Address getAddressByEmployeeId(int id) throws CustomException {
+    public AddressDto getAddressByEmployeeId(int id) throws CustomException {
         try {
-            Address address = addressRepository.findByEmployeeIdAndIsDeletedFalse(id);
-            if (address == null) {
-                throw new NoSuchElementException("No address found for ID: " + id);
-            }
-            return address;
-        } catch (NoSuchElementException e) {
-            logger.error("No address found for ID: " + id);
-            throw e;
+            Employee employee = employeeService.getEmployeeModelById(id);
+            return AddressMapper.modelToDto(employee.getAddress());
         } catch (Exception e) {
             logger.error("Error retrieving an address with employee id : {} ", id, e);
             throw new CustomException("Server Error!!!!", e);
@@ -119,8 +118,11 @@ public class AddressService {
      */
     public void deleteAddress(int id) throws CustomException {
         try {
-            Address address = getAddressByEmployeeId(id);
+            Employee employee = employeeService.getEmployeeModelById(id);
+            Address address = employee.getAddress();
             address.setDeleted(true);
+            employee.setAddress(null);
+            employeeService.saveEmployee(employee);
             addressRepository.save(address);
             logger.info("Address removed successfully with ID: {}", id);
         } catch (Exception e) {

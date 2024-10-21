@@ -1,22 +1,25 @@
 package com.i2i.ems.service;
 
-import com.i2i.ems.dto.ProjectDto;
-import com.i2i.ems.helper.CustomException;
-import com.i2i.ems.model.Employee;
-import com.i2i.ems.model.Project;
-import com.i2i.ems.repository.ProjectRepository;
+import java.util.NoSuchElementException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.i2i.ems.dto.ProjectDto;
+import com.i2i.ems.helper.CustomException;
+import com.i2i.ems.model.Employee;
+import com.i2i.ems.model.Project;
+import com.i2i.ems.repository.ProjectRepository;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
 public class ProjectServiceTest {
 
     @Mock
@@ -31,7 +34,6 @@ public class ProjectServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         project = Project.builder()
                 .projectId(1)
                 .name("testName")
@@ -54,7 +56,7 @@ public class ProjectServiceTest {
 
     @Test
     void testAddProject() throws CustomException {
-        when(projectRepository.save(project)).thenReturn(project);
+        when(projectRepository.save(any(Project.class))).thenReturn(project);
         ProjectDto result = projectService.addProject(projectDto);
         assertNotNull(result);
         assertEquals(projectDto.getName(), result.getName());
@@ -88,7 +90,7 @@ public class ProjectServiceTest {
 
     @Test
     void testUpdateProject() throws CustomException {
-        when(projectRepository.save(project)).thenReturn(project);
+        when(projectRepository.save(any(Project.class))).thenReturn(project);
         ProjectDto result = projectService.updateProject(projectDto);
         assertNotNull(result);
         assertEquals(projectDto.getName(), result.getName());

@@ -1,24 +1,28 @@
 package com.i2i.ems.service;
 
-import com.i2i.ems.dto.QualificationDto;
-import com.i2i.ems.helper.CustomException;
-import com.i2i.ems.model.Employee;
-import com.i2i.ems.model.Qualification;
-import com.i2i.ems.repository.QualificationRepository;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
+import com.i2i.ems.dto.QualificationDto;
+import com.i2i.ems.helper.CustomException;
+import com.i2i.ems.model.Employee;
+import com.i2i.ems.model.Qualification;
+import com.i2i.ems.repository.QualificationRepository;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
 public class QualificationServiceTest {
 
     @Mock
@@ -33,7 +37,6 @@ public class QualificationServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         qualification = Qualification.builder()
                 .qualificationId(1)
                 .courseName("testName")
