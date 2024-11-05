@@ -69,12 +69,7 @@ public class EmployeeMapper {
                 .email(employeeDto.getEmail())
                 .mobileNumber(employeeDto.getMobileNumber())
 
-                .address((employeeDto.getAddress() != null) ? Address.builder()
-                        .addressId(employeeDto.getAddress().getAddressId())
-                        .area(employeeDto.getAddress().getArea())
-                        .city(employeeDto.getAddress().getCity())
-                        .country(employeeDto.getAddress().getCountry())
-                        .build() : null)
+                .address((employeeDto.getAddress() != null) ? AddressMapper.dtoToModel(employeeDto.getAddress()) : null)
 
                 .project((employeeDto.getProject() == null) ? null : Project.builder()
                         .projectId(employeeDto.getProject().getProjectId())

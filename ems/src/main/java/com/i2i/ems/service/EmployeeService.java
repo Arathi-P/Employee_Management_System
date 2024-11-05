@@ -139,8 +139,23 @@ public class EmployeeService {
         }
     }
 
+    /**
+     * <p>
+     * Retrieves an employee model.
+     * </p>
+     *
+     * @param id of an employee.
+     * @return the Employee model
+     */
     public Employee getEmployeeModelById(int id) {
-        return employeeRepository.findByIdAndIsDeletedFalse(id);
+        try {
+            Employee employee = employeeRepository.findByIdAndIsDeletedFalse(id);
+            logger.info("Retrieved employee for the given id: {}", id);
+            return employee;
+        } catch (Exception e) {
+            logger.error("Error in retrieving employee for the given id: {}", id);
+            throw new CustomException("Server error!!", e);
+        }
     }
 
     /**
@@ -199,12 +214,18 @@ public class EmployeeService {
 
     /**
      * <p>
-     *  Saves an employee.
+     * Saves an employee.
      * </p>
      *
      * @param employee model.
      */
     public void saveEmployee(Employee employee) {
-        employeeRepository.save(employee);
+        try {
+            employeeRepository.save(employee);
+            logger.info("Employee saved successfully");
+        } catch (Exception e) {
+            logger.error("Error in saving employee");
+            throw new CustomException("Server error!!", e);
+        }
     }
 }

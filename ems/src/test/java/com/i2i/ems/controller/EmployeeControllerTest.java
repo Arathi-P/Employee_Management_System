@@ -24,7 +24,6 @@ import com.i2i.ems.service.EmployeeService;
 @ExtendWith(MockitoExtension.class)
 class EmployeeControllerTest {
 
-
     @Mock
     private EmployeeService employeeService;
 
